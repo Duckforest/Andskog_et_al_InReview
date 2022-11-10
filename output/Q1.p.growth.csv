@@ -1,0 +1,4 @@
+,Intercept,log(Distance),log(Distance):Fish,log(Distance):Ambient,log(Distance):Fish:Ambient
+P,0.077,0.000,0.000,0.001,0.203
+N,0.083,0.000,0.000,0.911,0.974
+N:P,0.076,0.000,0.020,0.003,0.620

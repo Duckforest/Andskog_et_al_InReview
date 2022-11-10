@@ -1,0 +1,4 @@
+"","Intercept","log(Distance)","log(Distance):Fish","log(Distance):Ambient","log(Distance):Fish:Ambient","log(Distance):Fish:Bites","log(Distance):Ambient:Bites","R2m","R2c","AICc"
+"P",-0.973,-0.121,-0.063,0.069,0.054,0.011,-0.065,0.13,0.659,307.58
+"N",-0.972,-0.16,-0.099,-0.007,-0.026,0.033,0.02,0.089,0.67,317.28
+"N:P",-0.975,-0.172,0.043,-0.06,0,-0.122,0.03,0.113,0.668,308.24

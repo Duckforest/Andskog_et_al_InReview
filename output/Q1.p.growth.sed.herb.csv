@@ -1,0 +1,4 @@
+,Intercept,log(Distance),log(Distance):Fish,log(Distance):Sediment,log(Distance):Fish:Sediment,log(Distance):Fish:Bites,log(Distance):Sediment:Bites
+P,0.268,0,0,0.004,0.896,0.351,0.632
+N,0.262,0,0.328,0.002,0.092,0.544,0.071
+N:P,0.282,0,0.047,0.015,0.214,0.004,0.483

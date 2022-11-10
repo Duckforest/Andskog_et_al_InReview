@@ -1,0 +1,4 @@
+"","Intercept","log(Distance)","log(Distance):Fish","log(Distance):Sediment","log(Distance):Fish:Sediment","log(Distance):Fish:Bites","log(Distance):Sediment:Bites","R2m","R2c","AICc"
+"P",-0.972,-0.176,-0.116,0.092,-0.035,0.034,0.026,0.128,0.653,306.55
+"N",-0.975,-0.095,-0.015,0.092,0.112,-0.023,-0.108,0.123,0.666,307.74
+"N:P",-0.973,-0.169,0.053,0.045,-0.04,-0.091,-0.054,0.082,0.686,312.1

@@ -1,0 +1,5 @@
+,Fish.N,Fish.P,Fish.NP,Seagrass.N20,Seagrass.P20,Seagrass.NP20,Sediment.N,Sediment.P,Sediment.NP
+Shoot growth threshold,-0.03,0.05,-0.12,-0.28,0.27,-0.33,-0.15,0.27,-0.36
+Seagrass %P threshold,-0.32,-0.10,-0.20,0.13,0.16,-0.15,0.64,0.33,0.45
+Shoot growth slope,-0.10,-0.11,0.05,0.05,-0.32,0.23,-0.66,-0.49,-0.06
+Seagrass %P slope,-0.10,0.02,0.01,-0.25,0.45,-0.55,0.73,0.60,0.23

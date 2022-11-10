@@ -1,0 +1,4 @@
+"","Intercept","log(Distance)","log(Distance):Fish","log(Distance):Sediment","log(Distance):Fish:Sediment"
+"P",0.129,0,0,0.001,0.872
+"N",0.147,0.001,0.305,0.029,0.165
+"N:P",0.183,0,0.099,0.124,0.116

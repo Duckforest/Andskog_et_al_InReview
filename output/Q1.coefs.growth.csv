@@ -1,0 +1,4 @@
+,Intercept,log(Distance),log(Distance):Fish,log(Distance):Ambient,log(Distance):Fish:Ambient,R2m,R2c,AICc
+P,4.41,-0.25,-0.09,0.07,0.02,0.11,0.87,245.4
+N,4.42,-0.26,-0.10,0.00,0.00,0.09,0.88,254.5
+N:P,4.41,-0.26,0.06,-0.06,-0.01,0.10,0.86,257.0
