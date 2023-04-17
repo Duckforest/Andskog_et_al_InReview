@@ -86,6 +86,16 @@ shoot = shoot %>%
 shoot$Sum.growth.area[ shoot$Sum.growth.area == 0] <- NA
 shoot[shoot == "NaN" ] <- NA
 
+##For reviewers epiphyte:shoot ratio
+shoot$epishoot <- shoot$Epiphytes/shoot$Shoot.Wt
+summary(shoot$epishoot)
+mean(shoot$epishoot, na.rm = T)
+sd(shoot$epishoot, na.rm = T)
+boxplot(shoot$epishoot~shoot$Island)
+bwplot(epishoot ~ as.factor(Distance) | Reef,
+       data = shoot, pch = 19,
+       layout = c(3,5))
+
 #Getting area to biomass slope
 WA <-read.csv("input/New weight area.csv", dec=".",sep = ",",stringsAsFactors = FALSE)
 
@@ -148,7 +158,7 @@ distance[ distance == "NaN" ] <- NA
 distance$Seagrass.CN[ distance$Seagrass.CN == 0 ] <- NA
 distance$Seagrass.NP[ distance$Seagrass.NP == 0 ] <- NA
 
-#Mergin with Bahamas growth
+#Merging with Bahamas growth
 bahamasshoot<- bahamas_growth %>% 
   group_by(Shoot.ID) %>% 
   summarise(Transect.ID = first(Transect.ID),
