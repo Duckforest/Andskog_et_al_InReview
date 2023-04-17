@@ -434,48 +434,50 @@ Haiti_slope= subset(slope.mean, slope.mean$Island == "Haiti")
 Bahamas_slope = subset(slope.mean, slope.mean$Island == "Bahamas")
 
 ##testing normality
-shapiro.test(Haiti_thresh$Seagrass.P)# p = 0.5059
-shapiro.test(Bahamas_thresh$Seagrass.P)# p = 0.008093 MOW3 is outlier, for analysis this is OK, because not-significant anyway
-hist(Bahamas_thresh$Seagrass.P)
-shapiro.test(Haiti_thresh$Shoot.growth)# p = 0.2013
-shapiro.test(Bahamas_thresh$Shoot.growth)# p = 0.1502
-
-shapiro.test(Haiti_slope$Seagrass.P)# p = 0.781
-shapiro.test(Bahamas_slope$Seagrass.P)# p = 0.637
-shapiro.test(Haiti_slope$Shoot.growth)# p = 0.4844
-shapiro.test(Bahamas_slope$Shoot.growth)# p = 0.7637
-
 var.test(Seagrass.P ~ Island, data = thresh.mean) #Good
 var.test(Shoot.growth ~ Island, data = thresh.mean) #Good
+var.test(Seagrass.C13 ~ Island, data = thresh.mean) #Good
 var.test(Seagrass.P ~ Island, data = slope.mean) #Good
 var.test(Shoot.growth ~ Island, data = slope.mean) #Good
+var.test(Seagrass.C13 ~ Island, data = slope.mean) #Good
 
 
 #####t-tests####
-t.test(Haiti_thresh$Shoot.growth, Bahamas_thresh$Shoot.growth) # p = 0.7721
+t.test(Haiti_thresh$Shoot.growth, Bahamas_thresh$Shoot.growth) # p = 0.76
 mean(Haiti_thresh$Shoot.growth, na.rm = T)
 sd(Haiti_thresh$Shoot.growth, na.rm = T)
 mean(Bahamas_thresh$Shoot.growth, na.rm = T)
 sd(Bahamas_thresh$Shoot.growth, na.rm = T)
 
-t.test(Haiti_thresh$Seagrass.P, Bahamas_thresh$Seagrass.P) # p = 0.5029
+t.test(Haiti_thresh$Seagrass.P, Bahamas_thresh$Seagrass.P) # p = 0.50
 mean(Haiti_thresh$Seagrass.P, na.rm = T)
 sd(Haiti_thresh$Seagrass.P, na.rm = T)
 mean(Bahamas_thresh$Seagrass.P, na.rm = T)
 sd(Bahamas_thresh$Seagrass.P, na.rm = T)
 
-t.test(Haiti_slope$Shoot.growth, Bahamas_slope$Shoot.growth) # p = 0.3526
+t.test(Haiti_slope$Shoot.growth, Bahamas_slope$Shoot.growth) # p = 0.34
 mean(Haiti_slope$Shoot.growth, na.rm = T)
 sd(Haiti_slope$Shoot.growth, na.rm = T)
 mean(Bahamas_slope$Shoot.growth, na.rm = T)
 sd(Bahamas_slope$Shoot.growth, na.rm = T)
 
-t.test(Haiti_slope$Seagrass.P, Bahamas_slope$Seagrass.P) # p = 0.0367
+t.test(Haiti_slope$Seagrass.P, Bahamas_slope$Seagrass.P) # p = 0.037
 mean(Haiti_slope$Seagrass.P, na.rm = T)
 sd(Haiti_slope$Seagrass.P, na.rm = T)
 mean(Bahamas_slope$Seagrass.P, na.rm = T)
 sd(Bahamas_slope$Seagrass.P, na.rm = T)
 
+t.test(Haiti_thresh$Seagrass.C13, Bahamas_thresh$Seagrass.C13) # p = 0.70
+mean(Haiti_thresh$Seagrass.C13, na.rm = T)
+sd(Haiti_thresh$Seagrass.C13, na.rm = T)
+mean(Bahamas_thresh$Seagrass.C13, na.rm = T)
+sd(Bahamas_thresh$Seagrass.C13, na.rm = T)
+
+t.test(Haiti_slope$Seagrass.C13, Bahamas_slope$Seagrass.C13) # p = 0.011
+mean(Haiti_slope$Seagrass.C13, na.rm = T)
+sd(Haiti_slope$Seagrass.C13, na.rm = T)
+mean(Bahamas_slope$Seagrass.C13, na.rm = T)
+sd(Bahamas_slope$Seagrass.C13, na.rm = T)
 
 # Thresholds per Island figure -----------------------------------------------------
 prop.threshold <- thresholds
@@ -534,22 +536,22 @@ predators <- data.frame(thresh.preds.mean[c("Reef","Fish.N", "Fish.P","Fish.NP",
                           summarise_all(.funs = c(. = "mean"), na.rm = T))
 names(predators) <- gsub("_.", "", names(predators), fixed = TRUE)
 
-table2.p <- data.frame(matrix(nrow = 4, ncol = 9))
+table2.p <- data.frame(matrix(nrow = 6, ncol = 9))
 colnames(table2.p) <- names(predators[2:10])
-rownames(table2.p) <- c("Shoot growth threshold", "Seagrass %P threshold",
-                        "Shoot growth slope", "Seagrass %P slope")
+rownames(table2.p) <- c("Shoot growth threshold", "Seagrass %P threshold", "Seagrass C13 threshold",
+                        "Shoot growth slope", "Seagrass %P slope", "Seagrass C13 slope")
 table2 <- table2.p
 
 
-resp <- c("Shoot.growth", "Seagrass.P")
+resp <- c("Shoot.growth", "Seagrass.P", "Seagrass.C13")
 par(mfrow = c(3,3))
 
-#quick and dirrrty for loop
+#quick for loop
 for (i in 2:10){
   # Shoot growth threshold
   predictor <- names(predators[i])
   
-  for (j in 1:2){
+  for (j in 1:3){
     response <- resp[j]
     thresh <- unique(data.frame(na.omit(merge(thresh.preds.mean[c("Reef","colour",response)],
                                               predators[c("Reef", predictor)]))))
@@ -569,15 +571,15 @@ for (i in 2:10){
     lm.slope <- summary(lm(slope[,3]~ slope[,4]))
     lm.thresh <- summary(lm(thresh[,3]~ thresh[,4]))
     
-    # table2.p[j,i-1] <- round(lm.thresh$coefficients[2,4], 3)
-    # table2.p[j+2,i-1] <- round(lm.slope$coefficients[2,4],3)
+    table2.p[j,i-1] <- round(lm.thresh$coefficients[2,4], 3)
+    table2.p[j+3,i-1] <- round(lm.slope$coefficients[2,4],3)
     
-    table2.p[j,i-1] <- round(lm.thresh$adj.r.squared, 3)
-    table2.p[j+2,i-1] <- round(lm.slope$adj.r.squared,3)
+    # table2.r2[j,i-1] <- round(lm.thresh$adj.r.squared, 3)
+    # table2.r2[j+3,i-1] <- round(lm.slope$adj.r.squared,3)
     
     
     table2[j,i-1] <- round(lm.thresh$coefficients[2,1], 3)
-    table2[j+2,i-1] <- round(lm.slope$coefficients[2,1],3)
+    table2[j+3,i-1] <- round(lm.slope$coefficients[2,1],3)
     
     
     #Plotting
@@ -593,11 +595,8 @@ for (i in 2:10){
 
 # write.csv(table2, "output/table2.csv")
 # write.csv(table2.p, "output/table2.p.csv")
-# write.csv(table2, "output/table2.lm.csv")
-# write.csv(table2.p, "output/table2.p.lm.csv")
 
 # ******Full figure code for paper ----------------------------------------------
-#Ordering reefs by organic matter in sediment
 #Order by ambient 20% P
 reef.order <- predators[with(predators, order(-Seagrass.P20)),]
 reef.order$Island <- sapply(reef.order$Reef,islandfunc)
@@ -613,8 +612,8 @@ Bahamasall <- Bahamasall[order(factor(Bahamasall$Reef, levels = rev(c("MOW1","MO
 # Bahamas GAM figs -----------------------------------------------------------
 
 ylabs = data.frame(matrix(nrow = 7))
-ylabs[1,1] = expression(mm^2~shoot^-1~day^-1)
-ylabs[2,1] = expression(g~C~m^-2~day^-1)
+ylabs[1,1] = expression(mm^2~day^-1)
+ylabs[2,1] = expression(g~m^-2~day^-1)
 ylabs[3,1] = expression(mm^2~mg^-1)
 ylabs[4,1] = expression("%")
 ylabs[5,1] = expression("%")
@@ -623,8 +622,8 @@ ylabs[7,1] = expression("\u2030")
 
 ## With the title descriptors in the labs 
 # ylabs = data.frame(matrix(nrow = 6))
-# ylabs[1,1] = expression(Shoot~growth~(mm^2~shoot^-1~day^-1))
-# ylabs[2,1] = expression(C~production~(g~C~m^-2~day^-1))
+# ylabs[1,1] = expression(Shoot~growth~(mm^2~day^-1))
+# ylabs[2,1] = expression(C~production~(g~m^-2~day^-1))
 # ylabs[3,1] = expression(SLA~(mm^2~mg^-1))
 # ylabs[4,1] = expression(Seagrass~P~content~"(%)")
 # ylabs[5,1] = expression(Seagrass~N~content~"(%)")
@@ -634,40 +633,64 @@ ylabs[7,1] = expression("\u2030")
 #main fig
 ylims = data.frame(matrix(nrow = 7, ncol = 5))
 colnames(ylims) = c("ymin", "ymax", "seq1", "seq2", "by")
-ylims[1,1:5] = c(0,230, 0, 200, 50)
-ylims[2,1:5] = c(0,1.4,0, 1.2, 0.4)
-ylims[3,1:5] = c(15,26,15,25, 5)
-ylims[4,1:5] = c(0.05,0.181, 0.06,0.18, 0.04)
-ylims[5,1:5] = c(1.2,2.05,1.2,2.0, 0.2)
-ylims[6,1:5] = c(0.4,2.5,0.5,2.5, 0.5)
-ylims[7,1:5] = c(-11,-7.5,-11,-8, 1)
+summary(Haitiall$`Shoot growth`)
+summary(Bahamasall$`Shoot growth`)
+summary(Haitiall$`C production`)
+summary(Bahamasall$`C production`)
+summary(Haitiall$SLA)
+summary(Bahamasall$SLA)
+summary(Haitiall$`Seagrass %P`)
+summary(Bahamasall$`Seagrass %P`)
+summary(Haitiall$`Seagrass %N`)
+summary(Bahamasall$`Seagrass %N`)
+summary(Haitiall$LAI)
+summary(Bahamasall$LAI)
+summary(Haitiall$Seagrass.C13)
+summary(Bahamasall$Seagrass.C13)
+
+ylims[1,1:5] = c(0,350, 0, 300, 100)
+ylims[2,1:5] = c(0,2.15,0, 2, 0.5)
+ylims[3,1:5] = c(12,35,15,35, 10)
+ylims[4,1:5] = c(0.05,0.2, 0.05,0.2, 0.05)
+ylims[5,1:5] = c(1,2.5,1,2.5, 0.5)
+ylims[6,1:5] = c(0,4,0,4, 1)
+ylims[7,1:5] = c(-12,-6,-12,-6, 2)
 
 min_reef <- NULL
 max_reef <- NULL
 
-layout.matrix=matrix(c(1:16,rep(17,4),18,19,19:22,19,19,23,24,25,rep(26,4)), byrow=TRUE, ncol=5,nrow=7)
+
+#A4 has 16.8 cm for figure
+layout.matrix=matrix(c(1:11,rep(12,4),13,14,14:17,14,14,18:20,14,14,21:23,rep(24,4)), byrow=TRUE, ncol=5,nrow=7)
 layout(mat = layout.matrix,
-       heights = c(2,2,2,0.5,2,2,0.5), # Heights of the rows
-       widths = c(1.5,rep(3,4))) # Widths of the columns
+       heights = lcm(c(2.5,2.5,0.7,(5/3),(5/3),(5/3),0.7)), # Heights of the rows
+       widths = lcm(c(1.8,rep(3.7,4)))) # Widths of the columns
 
 
+# Fig start ---------------------------------------------------------------
+
+
+layout.matrix=matrix(c(1:11,rep(12,4),13,13,14:16,13,13,17:19,rep(20,5)), byrow=TRUE, ncol=5,nrow=6)
+layout(mat = layout.matrix,
+       heights = lcm(c(2.5,2.5,0.7,2.5,2.5,0.7)), # Heights of the rows
+       widths = lcm(c(1.8,rep(3.7,4)))) # Widths of the columns
 
 #Legend
-par(mar = c(0, 0,2,0),mgp=c(2.8, 0.7, 0),
-    family = "serif", font = 1, font.main = 1, cex.lab = 2, cex.axis = 2, 
-    cex.main = 2)
+par(mar = c(0, 0, 0.5, 0),mgp=c(0, 0, 0), lwd = 0.75,
+    family = "serif", font = 1, font.main = 1, cex.lab = 1, cex.axis = 1, 
+    cex.main = 1, cex.sub = 1) 
 plot(0, 0, type='n', bty='n'
      , xaxt='n', yaxt='n'
 )
 # text(-1,1,"Bahamas", xjust = 0, line = -0.5)
 
 legend(-1,1.2, c(unique(as.character(Bahamasall$Reef))), 
-       pt.bg=unique(Bahamasall$colour), horiz=F, cex=2,bty = "n", text.width = 0.4, 
-       pch=22, pt.cex = 3,xjust = 0,title = "Haiti", title.adj = 0.5,adj = 0,
-       y.intersp=0.4,x.intersp=0.4) 
+       pt.bg=unique(Bahamasall$colour), horiz=F, cex=1,bty = "n", text.width = 0.4, 
+       pch=22, pt.cex = 2.5,xjust = 0,title = "Haiti", title.adj = 0,adj = 0,
+       y.intersp=0.8,x.intersp=1, pt.lwd = 0.75) 
 
 
-for(i in c(1:2,4:5)){
+for(i in c(2,1,4,7)){
   
   var=Bahamasall[,i]
   Dist=as.numeric(Bahamasall$Distance)
@@ -688,21 +711,21 @@ for(i in c(1:2,4:5)){
     
     
   }
-  # ymin=min(min_reef, na.rm=T)
-  # ymax=max(max_reef, na.rm=T)
+  # ymin=min(var, na.rm=T)
+  # ymax=max(var, na.rm=T)
   
   ymin = ylims[i,1]
   ymax = ylims[i,2]
   at = seq(ylims[i,3], ylims[i,4], by = ylims[i,5])
   
-  par(mar = c(0, 4.5, 2, 0.5),mgp=c(2.8, 0.7, 0))
+  par(mar = c(0, 3, 1, 0),mgp=c(1.7, 0.5, 0))
   
   plot(Dist,y=var,ylim=c(ymin,ymax),type='n',col="white", xlab = "", main = paste(names(Bahamasall[i])), 
        ylab = ylabs[i,1],  xaxt="n",yaxt="n",xlim= c(0,12),frame.plot=F)
   
-  axis(2, pos = 0,at = c(ymin,ymax*2), las = 2,lwd.tick=0,labels=FALSE)
-  axis(2, pos = 0,at = at, las = 2,lwd = 0, lwd.tick = 1)
-  axis(1, pos = ymin, at = seq(0,14,2),labels=FALSE,lwd.tick = 1)
+  axis(2, pos = 0,at = c(ymin,ymax), las = 2,lwd.tick=0,labels=FALSE, lwd = 0.75)
+  axis(2, pos = 0,at = at, las = 2,lwd = 0, lwd.tick = 0.75, tck = -0.05)
+  axis(1, pos = ymin, at = seq(0,14,2),labels=FALSE,lwd.tick = 0.75, lwd = 0.75, tck = -0.05)
   # axis(3, at = seq(0,14,2), lwd.tick=0, labels=FALSE)
   # axis(4, pos = 12.5, at = c(ymin,ymax),lwd.tick=0, labels=FALSE)
   
@@ -723,14 +746,26 @@ for(i in c(1:2,4:5)){
     pred.resp = data.frame(val.for.pred, pred)
     
     #Average points
-    means=data.frame(cbind(x, Distance))
-    means=aggregate(means[,1], list(means$Distance), mean, na.rm=T)    
+    data.points=data.frame(cbind(x, Distance))
+    # summary <- aggregate(data.points$x, list(data.points$Distance), MeanCI, na.rm=T)
+    # summary<- setNames(data.frame(summary$Group.1, data.frame(summary$x)), c("Distance", "x", "lower", "upper"))
+    
     
     if( summary(gam1)$s.table[4] > 0.05 | AIC(gam1) > AIC(mod.lm) ) {
-      lines(pred.resp$pred~pred.resp$Distance, data=pred.resp,lwd=1, col = alpha(reefcols, 0.2))
+      lines(pred.resp$pred~pred.resp$Distance, lwd=1, col = alpha(reefcols, 0.2))
+      points(data.points$x~data.points$Distance, col = alpha(reefcols, 0.2), pch = 16, cex = 0.5)
+      # segments(summary$Distance, summary$lower,
+      #          summary$Distance, summary$upper,
+      #          col = alpha(reefcols, 0.2),lwd = 2, lty = 1.2 )
+      
     }
     else {
-      lines(pred.resp$pred~pred.resp$Distance, data=pred.resp,lwd=3, col = reefcols)
+      lines(pred.resp$pred~pred.resp$Distance, data=pred.resp,lwd=2, col = reefcols)
+      points(data.points$x~data.points$Distance,col = reefcols, pch = 16, cex = 0.5)
+      # segments(summary$Distance, summary$lower,
+      #          summary$Distance, summary$upper,
+      #          col = reefcols,lwd = 2, lty = 1.2 )
+      
     }
   }
 }
@@ -742,20 +777,19 @@ min_reef <- NULL
 max_reef <- NULL
 
 #Legend
-par(mar = c(0, 0,2,0),mgp=c(2.8, 0.7, 0))
+par(mar = c(0, 0, 0.5, 0),mgp=c(0, 0, 0))
 plot(0, 0, type='n', bty='n'
      , xaxt='n', yaxt='n'
 )
 
 legend(-1,1.2, c(unique(as.character(Haitiall$Reef))), 
-       pt.bg=unique(Haitiall$colour), horiz=F, cex=2,bty = "n", text.width = 0.4, 
-       pch=22, pt.cex = 3,xjust = 0,title = "Haiti", title.adj = 0.5,adj = 0,
-       y.intersp=0.4,x.intersp=0.4) 
-
+       pt.bg=unique(Haitiall$colour), horiz=F, cex=1,bty = "n", text.width = 0.4, 
+       pch=22, pt.cex = 2.5,xjust = 0,title = "Haiti", title.adj = 0,adj = 0,
+       y.intersp=0.8,x.intersp=1, pt.lwd = 0.75) 
 
 
 options(na.action = na.omit)
-for(i in c(1:2,4:5)){
+for(i in c(2,1,4,7)){
   
   var=Haitiall[,i]
   Dist=as.numeric(Haitiall$Distance)
@@ -776,21 +810,20 @@ for(i in c(1:2,4:5)){
     
     
   }
-  # ymin=min(min_reef, na.rm=T)
-  # ymax=max(max_reef, na.rm=T)
+  # ymin=min(var, na.rm=T)
+  # ymax=max(var, na.rm=T)
   ymin = ylims[i,1]
   ymax = ylims[i,2]
   at = seq(ylims[i,3], ylims[i,4], by = ylims[i,5])
   
-  par(mar = c(0, 4.5, 2, 0.5),mgp=c(2.8, 0.7, 0))
+  par(mar = c(0, 3, 1, 0),mgp=c(1.7, 0.5, 0))
   
+  plot(Dist,y=var,ylim=c(ymin,ymax),type='n',col="white", xlab = "", main = "", 
+       ylab = ylabs[i,1],  xaxt="n",yaxt="n",xlim= c(0,12),frame.plot=F)
   
-  plot(Dist,y=var,ylim=c(ymin,ymax),type='n',col="white", xlab = "", main = NA, ylab = ylabs[i,1], 
-       xaxt="n",yaxt="n",xlim= c(0,12),frame.plot=F)
-  
-  axis(2, pos = 0,at = c(ymin,ymax*2), las = 2,lwd.tick=0,labels=FALSE)
-  axis(2, pos = 0,at = at, las = 2,lwd = 0, lwd.tick = 1)
-  axis(1, pos = ymin, at = seq(0,14,2),labels=FALSE,lwd.tick = 1)
+  axis(2, pos = 0,at = c(ymin,ymax), las = 2,lwd.tick=0,labels=FALSE, lwd = 0.75)
+  axis(2, pos = 0,at = at, las = 2,lwd = 0, lwd.tick = 0.75, tck = -0.05)
+  axis(1, pos = ymin, at = seq(0,14,2),labels=T,lwd.tick = 0.75, lwd = 0.75, tck = -0.05)
   # axis(3, at = seq(0,14,2), lwd.tick=0, labels=FALSE)
   # axis(4, pos = 12.5, at = c(ymin,ymax),lwd.tick=0, labels=FALSE)
   
@@ -810,14 +843,26 @@ for(i in c(1:2,4:5)){
     pred.resp = data.frame(val.for.pred, pred)
     
     #Average points
-    means=data.frame(cbind(x, Distance))
-    means=aggregate(means[,1], list(means$Distance), mean, na.rm=T)    
+    data.points=data.frame(cbind(x, Distance))
+    # summary <- aggregate(data.points$x, list(data.points$Distance), MeanCI, na.rm=T)
+    # summary<- setNames(data.frame(summary$Group.1, data.frame(summary$x)), c("Distance", "x", "lower", "upper"))
+    
     
     if( summary(gam1)$s.table[4] > 0.05 | AIC(gam1) > AIC(mod.lm) ) {
-      lines(pred.resp$pred~pred.resp$Distance, data=pred.resp,lwd=1, col = alpha(reefcols, 0.2))
+      lines(pred.resp$pred~pred.resp$Distance, lwd=1, col = alpha(reefcols, 0.2))
+      points(data.points$x~data.points$Distance, col = alpha(reefcols, 0.2), pch = 16, cex = 0.5)
+      # segments(summary$Distance, summary$lower,
+      #          summary$Distance, summary$upper,
+      #          col = alpha(reefcols, 0.2),lwd = 2, lty = 1.2 )
+      
     }
     else {
-      lines(pred.resp$pred~pred.resp$Distance, data=pred.resp,lwd=3, col = reefcols)
+      lines(pred.resp$pred~pred.resp$Distance, data=pred.resp,lwd=2, col = reefcols)
+      points(data.points$x~data.points$Distance,col = reefcols, pch = 16, cex = 0.5)
+      # segments(summary$Distance, summary$lower,
+      #          summary$Distance, summary$upper,
+      #          col = reefcols,lwd = 2, lty = 1.2 )
+      
     }
   }
 }
@@ -825,86 +870,93 @@ for(i in c(1:2,4:5)){
 
 
 # Threshold fig -----------------------------------------------------------
-par(mar = c(2, 2, 2, 1),mgp=c(3, 1, 0))
+# par(mar = c(2, 2, 2, 1),mgp=c(3, 1, 0))
+# 
+# plot(0, 0, type='n', bty='n', xaxt='n', yaxt='n')
+# meanthresh <- meanthresh[order(factor(meanthresh$Reef, levels = factor(c(reef.order)))),]
+# 
+# meanthresh<-meanthresh[order(factor(meanthresh$Reef,levels=rev(c("LH2", "LH3", "LH1", "MOW3", "MOW2", "MOW1", 
+#                                                                  "H1", "H6", "H2", "H4", "H3", "H8", "H5")))),]
+# sdthresh<-sdthresh[order(factor(sdthresh$Reef,levels=rev(c("LH2", "LH3", "LH1", "MOW3", "MOW2", "MOW1", 
+#                                                            "H1", "H6", "H2", "H4", "H3", "H8", "H5")))),]
+# 
+# 
+# Haiti.thresh= subset(meanthresh, meanthresh$Island == "1")
+# Bahamas.thresh= subset(meanthresh, meanthresh$Island == "2")
+# 
+# #getting alpha for non-significant GAMs
+# alfalfa <- function(x) {
+#   if (x == "NaN") return(0.2) 
+#   if(x > 0.2) return(1) 
+# }
+# 
+# #Dotplot
+# for(i in c(4:5,7:8)){
+#   
+#   var=meanthresh[,i]
+#   Reef.pos =1:13
+#   Reef = unique(meanthresh$Reef)
+#   Reef2= factor(Reef, levels = c(reef.order[,1]))
+#   alpha <- sapply(var,alfalfa)
+#   var[is.na(var)] <- 0.3
+#   sd=sdthresh[,i]
+#   ci=qt(0.975,df=boot-1)*sd/sqrt(boot)
+#   ci[is.na(ci)] <- 0
+#   
+#   line.haiti <- mean(Haiti.thresh[,i], na.rm = T)
+#   line.bahamas <- mean(Bahamas.thresh[,i], na.rm = T)
+#   
+#   colour = unique(meanthresh$colour)
+#   par(mar = c(2, 4.5, 2, 0.5))
+#   
+#   plot(0, 0, type='n', xlim= c(0,12), ylim = c(1,13), yaxt = "n", xaxt = "n",
+#        ylab = "", xlab="",frame.plot=F)
+#   
+#   segments(var-ci , Reef.pos,
+#            var+ci , Reef.pos,
+#            col = alpha(colour, alpha),lwd = 2, lty = 1.2 )
+#   arrows(x0=line.bahamas, y0=7, x1=line.bahamas, y1=13, code=2, col="#6A51A3", lwd=1, 
+#          length = 0, lty = 2)
+#   arrows(x0=line.haiti, y0=1, x1=line.haiti, y1=6, code=2, col="#238B45", lwd=1, 
+#          length = 0, lty = 2)
+#   points(var, Reef.pos, pch = 16, col = alpha(colour, alpha),lwd = 1, cex = 2.2)
+#   if(names(meanthresh[i]) == "Shoot.growth_mean"){
+#     axis(2, at=c(0:14), labels=c("",as.character(Reef),""),pos = 0,las = 2, cex.axis = 1)
+#   }else{
+#     axis(2, at=c(0:14), labels=FALSE,pos = 0,las = 2, cex.axis = 1)
+#   }
+#   axis(1, pos = 0.5, at = seq(0,14,2))
+#   # axis(3, pos = 13.5,at = seq(0,14,2), lwd.tick=0, labels=FALSE)
+#   # axis(4, pos = 12.5, at = c(0:14),lwd.tick=0, labels=FALSE)
+#   
+# }
+# 
+# 
 
+par(mar = c(0, 0, 0.5, 0),mgp=c(0, 0, 0))
+
+# par(mar = c(0, 1, 1, 0.5),mgp=c(2.8, 0.7, 0))
 plot(0, 0, type='n', bty='n', xaxt='n', yaxt='n')
-meanthresh <- meanthresh[order(factor(meanthresh$Reef, levels = factor(c(reef.order)))),]
-
-meanthresh<-meanthresh[order(factor(meanthresh$Reef,levels=rev(c("LH2", "LH3", "LH1", "MOW3", "MOW2", "MOW1", 
-                                                                 "H1", "H6", "H2", "H4", "H3", "H8", "H5")))),]
-sdthresh<-sdthresh[order(factor(sdthresh$Reef,levels=rev(c("LH2", "LH3", "LH1", "MOW3", "MOW2", "MOW1", 
-                                                           "H1", "H6", "H2", "H4", "H3", "H8", "H5")))),]
 
 
-Haiti.thresh= subset(meanthresh, meanthresh$Island == "1")
-Bahamas.thresh= subset(meanthresh, meanthresh$Island == "2")
+par(mar = c(0, 0, 2, 0),mgp=c(1.7, 0.5, 0))
 
-#getting alpha for non-significant GAMs
-alfalfa <- function(x) {
-  if (x == "NaN") return(0.2) 
-  if(x > 0.2) return(1) 
-}
-
-#Dotplot
-for(i in c(4:5,7:8)){
-  
-  var=meanthresh[,i]
-  Reef.pos =1:13
-  Reef = unique(meanthresh$Reef)
-  Reef2= factor(Reef, levels = c(reef.order[,1]))
-  alpha <- sapply(var,alfalfa)
-  var[is.na(var)] <- 0.3
-  sd=sdthresh[,i]
-  ci=qt(0.975,df=boot-1)*sd/sqrt(boot)
-  ci[is.na(ci)] <- 0
-  
-  line.haiti <- mean(Haiti.thresh[,i], na.rm = T)
-  line.bahamas <- mean(Bahamas.thresh[,i], na.rm = T)
-  
-  colour = unique(meanthresh$colour)
-  par(mar = c(2, 4.5, 2, 0.5))
-  
-  plot(0, 0, type='n', xlim= c(0,12), ylim = c(1,13), yaxt = "n", xaxt = "n",
-       ylab = "", xlab="",frame.plot=F)
-  
-  segments(var-ci , Reef.pos,
-           var+ci , Reef.pos,
-           col = alpha(colour, alpha),lwd = 2, lty = 1.2 )
-  arrows(x0=line.bahamas, y0=7, x1=line.bahamas, y1=13, code=2, col="#6A51A3", lwd=1, 
-         length = 0, lty = 2)
-  arrows(x0=line.haiti, y0=1, x1=line.haiti, y1=6, code=2, col="#238B45", lwd=1, 
-         length = 0, lty = 2)
-  points(var, Reef.pos, pch = 16, col = alpha(colour, alpha),lwd = 1, cex = 2.2)
-  if(names(meanthresh[i]) == "Shoot.growth_mean"){
-    axis(2, at=c(0:14), labels=c("",as.character(Reef),""),pos = 0,las = 2, cex.axis = 1)
-  }else{
-    axis(2, at=c(0:14), labels=FALSE,pos = 0,las = 2, cex.axis = 1)
-  }
-  axis(1, pos = 0.5, at = seq(0,14,2))
-  # axis(3, pos = 13.5,at = seq(0,14,2), lwd.tick=0, labels=FALSE)
-  # axis(4, pos = 12.5, at = c(0:14),lwd.tick=0, labels=FALSE)
-  
-}
-
-
-par(mar = c(0, 1, 1, 0.5),mgp=c(2.8, 0.7, 0))
-plot(0, 0, type='n', bty='n', xaxt='n', yaxt='n')
-
-par(mar = c(0, 4.5, 1, 0.5),mgp=c(2.8, 0.7, 0))
+# par(mar = c(0, 4.5, 3, 0.5),mgp=c(2.8, 0.7, 0))
 plot(0, 0, type='n',bty='n', main = "Distance (m)", xaxt='n', yaxt='n', ylab = "")
 
 #17x7
 # Threshold proportions ---------------------------------------------------
-par(mar = c(0, 0,2,0),mgp=c(2.8, 0.7, 0))
-plot(0, 0, type='n', bty='n'
-     , xaxt='n', yaxt='n'
-)
+# par(mar = c(0, 0,2,0),mgp=c(2.8, 0.7, 0))
+# plot(0, 0, type='n', bty='n'
+#      , xaxt='n', yaxt='n'
+# )
 
-par(mar = c(2, 5,1,1),mgp=c(3.5, 0.7, 0))
+# par(mar = c(2, 5,1,1),mgp=c(3.5, 0.7, 0))
+par(mar = c(0, 2, 0, 0),mgp=c(2, 0.5, 0))
 
 
 #Changeplot
-x=barplot(totals.all[,c(1,2,4,5,3,6,7,8)],
+x=barplot(totals.all[,c(2,1,4,7,5,3,6,8)],
           col=c("#6A51A3","#238B45"),
           border="black",
           beside=T,
@@ -913,26 +965,138 @@ x=barplot(totals.all[,c(1,2,4,5,3,6,7,8)],
           xaxt = "n", yaxt = "n"
           # names.arg=c("Shoot growth","C production","%P","Seagrass %N","SLA","LAI","13CSeagrass","Overall"))
 )
-axis(1, at = c(5, 11, 17, 23), labels = c("C production","%N","LAI","Overall"),
-     col = "white", las = 1, pos = -0.07)
-axis(1, at = c(0, 2, 5, 8, 11, 14, 17, 20, 23), labels = c(NA,"Shoot growth",NA,"%P",NA,"SLA",NA,"d13C",NA))
-axis(2, at = seq(0,100,0.25), las = 2)
+axis(1, at = c(5, 11, 17, 23), labels = c("Shoot growth","d13C","SLA","Overall"),
+     col = "white", las = 1, pos = -0.07,lwd.ticks = 0.75,tck = -0.05, lwd = 0.75)
+axis(1, at = c(0, 2, 5, 8, 11, 14, 17, 20, 23), labels = c(NA,"C prod.",NA,"%P",NA,"%N",NA,"LAI",NA),
+     lwd.ticks = 0.75,tck = -0.02, lwd = 0.75)
+axis(2, at = seq(0,100,0.25), las = 2,lwd.ticks = 0.75,tck = -0.02, lwd = 0.75)
 abline(v=21.5, lty = 2, las = 1)
 abline(h=0)
 
-# Slope across island -----------------------------------------------------
-par(mar = c(2, 5,1,1),mgp=c(3.5, 0.7, 0))
+# Threshold across island -----------------------------------------------------
+par(mar = c(0, 3, 1, 0),mgp=c(1.7, 0.5, 0))
 
+#Shoot growth
+boxplot(Shoot.growth ~ Island, data = thresh.mean, col = "white", border = "white", ylim = c(1.5,4.5),
+        ylab = "Threshold (m)", xlab = NA,las = 1, yaxt = "n", main = "Shoot growth",
+        frame.plot = F, xaxt = "n")
+# title("Shoot growth", adj = 0, font = 1)
+min(thresh.mean$Shoot.growth, na.rm = T)
+max(thresh.mean$Shoot.growth, na.rm = T)
+
+axis(2, pos = 0.5, at = c(1.5,2.5,3.5,4.5), las = 2, lwd = 0, lwd.ticks = 0.75,
+     tck = -0.05)
+axis(2, pos = 0.5, at = c(1.5,4.5), las = 2, labels = F,lwd.ticks = 0, lwd = 0.75)
+text(2.5, 4.5, "NS", adj = c(1,1), cex = 1)
+
+axis(1, pos = 1.5, at = c(0,1,2,3), labels = c("","", "",""), lwd = 0.75)
+
+# Add data points
+mylevels <- levels(thresh.mean$Island)
+levelProportions <- summary(thresh.mean$Island)/nrow(thresh.mean)
+for(i in 1:length(mylevels)){
+  
+  thislevel <- mylevels[i]
+  thisvalues <- thresh.mean[thresh.mean$Island==thislevel, "Shoot.growth"]
+  color = thresh.mean$colour[thresh.mean$Island==thislevel]
+  # take the x-axis indices and add a jitter, proportional to the N in each level
+  set.seed(7)
+  myjitter <- jitter(rep(i, length(thisvalues)), amount=levelProportions[i]/4)
+  ymean = mean(thisvalues, na.rm = T)
+  sd = sd(thisvalues, na.rm = T)
+  ci = CI(na.omit(thisvalues), ci = 0.95)
+  points(myjitter, thisvalues, pch=20, col=color, cex = 1.5) 
+  arrows(x0=i, y0=ymean-sd, x1=i, y1=ymean+sd, code=3, col="black", lwd=0.75, angle = 90, 
+         length = 0.02)
+  points(i, ymean , pch = 23, bg = "black", cex = 1.5)
+  
+}
+
+#Seagrass %P
+min(thresh.mean$Seagrass.P, na.rm = T)
+max(thresh.mean$Seagrass.P, na.rm = T)
+
+boxplot(Seagrass.P ~ Island, data = thresh.mean, col = "white", border = "white", ylim = c(1.5,4.5),
+        ylab = "", xlab = NA,las = 1, yaxt = "n", main = "Seagrass %P",
+        frame.plot = F, xaxt = "n")
+text(2.5, 4.5, "NS", adj = c(1,1), cex = 1)
+
+axis(2, pos = 0.5, at = c(1.5,2.5,3.5,4.5), las = 2, lwd = 0, lwd.ticks = 0.75,
+     tck = -0.05)
+axis(2, pos = 0.5, at = c(1.5,4.5), las = 2, labels = F,lwd.ticks = 0, lwd = 0.75)
+axis(1, pos = 1.5, at = c(0,1,2,3), labels = c("","", "",""), lwd = 0.75)
+
+# Add data points
+mylevels <- levels(thresh.mean$Island)
+levelProportions <- summary(thresh.mean$Island)/nrow(thresh.mean)
+for(i in 1:length(mylevels)){
+  
+  thislevel <- mylevels[i]
+  thisvalues <- thresh.mean[thresh.mean$Island==thislevel, "Seagrass.P"]
+  color = thresh.mean$colour[thresh.mean$Island==thislevel]
+  # take the x-axis indices and add a jitter, proportional to the N in each level
+  set.seed(8)
+  myjitter <- jitter(rep(i, length(thisvalues)), amount=levelProportions[i]/4)
+  ymean = mean(thisvalues, na.rm = T)
+  sd = sd(thisvalues, na.rm = T)
+  ci = CI(na.omit(thisvalues), ci = 0.95)
+  points(myjitter, thisvalues, pch=20, col=color, cex = 1.5) 
+  arrows(x0=i, y0=ymean-sd, x1=i, y1=ymean+sd, code=3, col="black", lwd=0.75, angle = 90, 
+         length = 0.02)
+  points(i, ymean , pch = 23, bg = "black", cex = 1.5)
+  
+}
+
+#Seagrass 13C
+min(thresh.mean$Seagrass.C13, na.rm = T)
+max(thresh.mean$Seagrass.C13, na.rm = T)
+
+boxplot(Seagrass.C13 ~ Island, data = thresh.mean, col = "white", border = "white", ylim = c(1.5,4.5),
+        ylab = "", xlab = NA,las = 1, yaxt = "n", main = "Seagrass d13C",
+        frame.plot = F, xaxt = "n")
+text(2.5, 4.5, "NS", adj = c(1,1), cex = 1)
+
+axis(2, pos = 0.5, at = c(1.5,2.5,3.5,4.5), las = 2, lwd = 0, lwd.ticks = 0.75,
+     tck = -0.05)
+axis(2, pos = 0.5, at = c(1.5,4.5), las = 2, labels = F,lwd.ticks = 0, lwd = 0.75)
+axis(1, pos = 1.5, at = c(0,1,2,3), labels = c("","", "",""), lwd = 0.75)
+
+# Add data points
+mylevels <- levels(thresh.mean$Island)
+levelProportions <- summary(thresh.mean$Island)/nrow(thresh.mean)
+for(i in 1:length(mylevels)){
+  
+  thislevel <- mylevels[i]
+  thisvalues <- thresh.mean[thresh.mean$Island==thislevel, "Seagrass.C13"]
+  color = thresh.mean$colour[thresh.mean$Island==thislevel]
+  # take the x-axis indices and add a jitter, proportional to the N in each level
+  set.seed(8)
+  myjitter <- jitter(rep(i, length(thisvalues)), amount=levelProportions[i]/4)
+  ymean = mean(thisvalues, na.rm = T)
+  sd = sd(thisvalues, na.rm = T)
+  ci = CI(na.omit(thisvalues), ci = 0.95)
+  points(myjitter, thisvalues, pch=20, col=color, cex = 1.5) 
+  arrows(x0=i, y0=ymean-sd, x1=i, y1=ymean+sd, code=3, col="black", lwd=0.75, angle = 90, 
+         length = 0.02)
+  points(i, ymean , pch = 23, bg = "black", cex = 1.5)
+  
+}
+
+# Slope across island -----------------------------------------------------
+#Shoot growth
 boxplot(Shoot.growth ~ Island, data = slope.mean, col = "white", border = "white", ylim = c(-70,0),
         ylab = "Effect size (slope)", xlab = NA,las = 1, yaxt = "n",
         frame.plot = F, xaxt = "n")
-title("Shoot growth", adj = 0, font = 1)
+# title("Shoot growth", adj = 0, font = 1)
+min(slope.mean$Shoot.growth, na.rm = T)
+max(slope.mean$Shoot.growth, na.rm = T)
 
-axis(2, at = c(-60,-40,-20,0), las = 2, lwd = 0, lwd.ticks = 1)
-axis(2, at = c(-70,0), las = 2, labels = F,lwd.ticks = 0)
-text(2.5, 0, "NS", adj = c(1,1), cex = 2)
+axis(2, pos = 0.5, at = c(-60,-40,-20,0), las = 2, lwd = 0, lwd.ticks = 0.75,
+     tck = -0.05)
+axis(2, pos = 0.5, at = c(-70,0), las = 2, labels = F,lwd.ticks = 0, lwd = 0.75)
+text(2.5, 0, "NS", adj = c(1,1), cex = 1)
 
-axis(1, pos = -70, at = c(0,1,2,3), labels = c("","Bahamas", "Haiti",""))
+axis(1, pos = -70, at = c(0,1,2,3), labels = c("","Bahamas", "Haiti",""), lwd = 0.75)
 
 # Add data points
 mylevels <- levels(slope.mean$Island)
@@ -948,19 +1112,27 @@ for(i in 1:length(mylevels)){
   ymean = mean(thisvalues, na.rm = T)
   sd = sd(thisvalues, na.rm = T)
   ci = CI(na.omit(thisvalues), ci = 0.95)
-  points(myjitter, thisvalues, pch=20, col=color, cex = 2.2) 
-  arrows(x0=i, y0=ymean-sd, x1=i, y1=ymean+sd, code=3, col="black", lwd=1, angle = 90, 
-         length = 0.05)
-  points(i, ymean , pch = 23, bg = "black", cex = 3)
+  points(myjitter, thisvalues, pch=20, col=color, cex = 1.5) 
+  arrows(x0=i, y0=ymean-sd, x1=i, y1=ymean+sd, code=3, col="black", lwd=0.75, angle = 90, 
+         length = 0.02)
+  points(i, ymean , pch = 23, bg = "black", cex = 1.5)
   
 }
 
-boxplot(Seagrass.P ~ Island, data = slope.mean, col = "white", border = "white",ylim = c(-0.040,0),
-        ylab = "Effect size (slope)", xlab = NA,las = 1, frame.plot = F, xaxt = "n")
-title("Seagrass %P", adj = 0, font = 1)
-text(2.5, 0, "**", adj = c(1,1), cex = 2)
+#Seagrass %P
+boxplot(Seagrass.P ~ Island, data = slope.mean, col = "white", border = "white", ylim = c(-0.040,0),
+        ylab = "", xlab = NA,las = 1, yaxt = "n",
+        frame.plot = F, xaxt = "n")
+# title("Shoot growth", adj = 0, font = 1)
+min(slope.mean$Seagrass.P, na.rm = T)
+max(slope.mean$Seagrass.P, na.rm = T)
 
-axis(1, pos = -0.04, at = c(0,1,2,3), labels = c("","Bahamas", "Haiti",""))
+axis(2, pos = 0.5, at = c(-0.04,-0.03,-0.02,-0.01,0), las = 2, lwd = 0, lwd.ticks = 0.75,
+     tck = -0.05)
+axis(2, pos = 0.5, at = c(-0.04,0), las = 2, labels = F,lwd.ticks = 0, lwd = 0.75)
+text(2.5, 0, "**", adj = c(1,1), cex = 1)
+
+axis(1, pos = -0.04, at = c(0,1,2,3), labels = c("","Bahamas", "Haiti",""), lwd = 0.75)
 
 # Add data points
 mylevels <- levels(slope.mean$Island)
@@ -976,10 +1148,46 @@ for(i in 1:length(mylevels)){
   ymean = mean(thisvalues, na.rm = T)
   sd = sd(thisvalues, na.rm = T)
   ci = CI(na.omit(thisvalues), ci = 0.95)
-  points(myjitter, thisvalues, pch=20, col=color, cex = 2.2) 
-  arrows(x0=i, y0=ymean-sd, x1=i, y1=ymean+sd, code=3, col="black", lwd=1, angle = 90, 
-         length = 0.05)
-  points(i, ymean , pch = 23, bg = "black", cex = 3)
+  points(myjitter, thisvalues, pch=20, col=color, cex = 1.5) 
+  arrows(x0=i, y0=ymean-sd, x1=i, y1=ymean+sd, code=3, col="black", lwd=0.75, angle = 90, 
+         length = 0.02)
+  points(i, ymean , pch = 23, bg = "black", cex = 1.5)
+  
+}
+
+#Seagrass 13C
+boxplot(Seagrass.C13 ~ Island, data = slope.mean, col = "white", border = "white", ylim = c(-1,1.5),
+        ylab = "", xlab = NA,las = 1, yaxt = "n",
+        frame.plot = F, xaxt = "n")
+# title("Shoot growth", adj = 0, font = 1)
+min(slope.mean$Seagrass.C13, na.rm = T)
+max(slope.mean$Seagrass.C13, na.rm = T)
+
+axis(2, pos = 0.5, at = c(-1,-0.5,0,0.5,1,1.5), las = 2, lwd = 0, lwd.ticks = 0.75,
+     tck = -0.05)
+axis(2, pos = 0.5, at = c(-1,1.5), las = 2, labels = F,lwd.ticks = 0, lwd = 0.75)
+text(2.5, 1.5, "**", adj = c(1,1), cex = 1)
+
+axis(1, pos = -1, at = c(0,1,2,3), labels = c("","Bahamas", "Haiti",""), lwd = 0.75)
+
+# Add data points
+mylevels <- levels(slope.mean$Island)
+levelProportions <- summary(slope.mean$Island)/nrow(slope.mean)
+for(i in 1:length(mylevels)){
+  
+  thislevel <- mylevels[i]
+  thisvalues <- slope.mean[slope.mean$Island==thislevel, "Seagrass.C13"]
+  color = slope.mean$colour[slope.mean$Island==thislevel]
+  # take the x-axis indices and add a jitter, proportional to the N in each level
+  set.seed(8)
+  myjitter <- jitter(rep(i, length(thisvalues)), amount=levelProportions[i]/4)
+  ymean = mean(thisvalues, na.rm = T)
+  sd = sd(thisvalues, na.rm = T)
+  ci = CI(na.omit(thisvalues), ci = 0.95)
+  points(myjitter, thisvalues, pch=20, col=color, cex = 1.5) 
+  arrows(x0=i, y0=ymean-sd, x1=i, y1=ymean+sd, code=3, col="black", lwd=0.75, angle = 90, 
+         length = 0.02)
+  points(i, ymean , pch = 23, bg = "black", cex = 1.5)
   
 }
 
@@ -1068,6 +1276,8 @@ layout.matrix=matrix(c(1:(4*3),13,rep(14,3)), byrow=TRUE, ncol=4,nrow=4)
 layout(mat = layout.matrix,
        heights = c(2,2,2,1), # Heights of the rows
        widths = c(1.5,rep(3,3))) # Widths of the columns
+min_reef <- NULL
+max_reef <- NULL
 
 
 #Legend
@@ -1089,7 +1299,7 @@ legend(-1,0.9, c(unique(as.character(Bahamasall$Reef))),
 
 
 
-for(i in c(3,6,7)){
+for(i in c(5,3,6)){
   
   var=Bahamasall[,i]
   Dist=as.numeric(Bahamasall$Distance)
@@ -1174,7 +1384,7 @@ legend(-1,0.9, c(unique(as.character(Haitiall$Reef))),
 
 
 options(na.action = na.omit)
-for(i in c(3,6,7)){
+for(i in c(5,3,6)){
   
   var=Haitiall[,i]
   Dist=as.numeric(Haitiall$Distance)
@@ -1267,7 +1477,7 @@ alfalfa <- function(x) {
 }
 
 #Dotplot
-for(i in c(6,9,10)){
+for(i in c(8,6,9)){
   
   var=meanthresh[,i]
   Reef.pos =1:13
@@ -1296,7 +1506,7 @@ for(i in c(6,9,10)){
   arrows(x0=line.haiti, y0=1, x1=line.haiti, y1=6, code=2, col="#238B45", lwd=1, 
          length = 0, lty = 2)
   points(var, Reef.pos, pch = 16, col = alpha(colour, alpha),lwd = 1, cex = 2.2)
-  if(names(meanthresh[i]) == "SLA_mean"){
+  if(names(meanthresh[i]) == "Seagrass.N_mean"){
     axis(2, at=c(0:14), labels=c("",as.character(Reef),""),pos = 0,las = 2, cex.axis = 1)
   }else{
     axis(2, at=c(0:14), labels=FALSE,pos = 0,las = 2, cex.axis = 1)
